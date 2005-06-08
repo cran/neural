@@ -1,0 +1,4 @@
+mlp                     MLP neural network recalling method
+mlptrain                MLP neural network training method
+rbf                     RBF neural network recalling method
+rbftrain                RBF neural network training method

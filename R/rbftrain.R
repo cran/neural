@@ -1,0 +1,429 @@
+rbftrain<-function(inp,neurons,out,alfa=0.2,it=40,err=0,sigma=1,online=TRUE,permute=TRUE,visual=TRUE){
+
+		rect<-function(x,y,value){
+			xx<-c(x,x+30,x+30,x)
+			yy<-c(y,y,y+30,y+30)
+			polygon(xx,yy,col="green");
+		}
+
+		drawnet<-function(run=FALSE){
+			plot(1:600,1:600,xlab="",ylab="",type="n",axes=FALSE);
+			title(main="RBF network");
+
+			polygon(c(0,65,65,0),c(125,125,87,87),col="lightblue2");
+			text(32,109,"Prev",cex=0.9);
+			polygon(c(80,145,145,80),c(125,125,87,87),col="lightblue2");
+			text(112,109,"Next",cex=0.9);
+			polygon(c(540,620,620,540),c(550,550,600,600),col="lightblue2");
+			text(580,578,ifelse(run==FALSE,"START","EXIT"),cex=0.9);
+			if ((run)&(ncol(inp)==1)){
+				polygon(c(540,620,620,540),c(450,450,500,500),col="lightblue2");
+				text(580,478,"DRAW",cex=0.9);
+			}
+			text(25,70,"Iteration:",cex=0.9);
+			polygon(c(75,160,160,75),c(45,45,85,85),col="turquoise");
+			polygon(c(160,240,240,160),c(45,45,85,85),col="snow3");
+			text(170,67,ifelse(run==FALSE,0,iter),pos=2,cex=0.9);
+			text(245,67,it,pos=2,cex=0.9);
+
+			text(25,30,"Error:",cex=0.9);
+			polygon(c(75,160,160,75),c(5,5,45,45),col="turquoise");
+			polygon(c(160,240,240,160),c(5,5,45,45),col="snow3");
+			text(170,27,round(error*10^(4-max(round(log10(error)),0)))/10^(4-max(round(log10(error)),0)),pos=2,cex=0.9);
+			text(245,27,err,pos=2,cex=0.9);
+
+
+			for(i in 1:length(cordx)){
+				for(j in 1:length(cordx[[i]])){
+					rect(cordx[[i]][j],cordy[[i]][j],val[[i]][j]);
+					if (i==1)
+						text(cordx[[i]][j]-10,cordy[[i]][j]+5,round(val[[i]][j]*100)/100)
+					else text(cordx[[i]][j]+40,cordy[[i]][j]+5,round(val[[i]][j]*100)/100);
+				}
+			}
+			for(i in 1:(length(cordx)-1)){
+				for(j in 1:length(cordx[[i]])){
+					for(k in 1:length(cordx[[i+1]])){
+						xx<-c(cordx[[i]][j]+30,cordx[[i+1]][k]);
+						yy<-c(cordy[[i]][j]+15,cordy[[i+1]][k]+15);
+						lines(xx,yy,col="blue");
+						text((xx[1]+xx[2])/2,(yy[1]+yy[2])/2,round(weigth[[i]][j,k]*100)/100)
+					}
+				}
+			}
+		}
+
+
+		graph<-function(){
+			plot(1:600,1:600,xlab="",ylab="",type="n",axes=FALSE);
+#			minx<-min(inp)-abs(min(inp)*0.2)
+#			miny<-min(out)-abs(min(out)*0.2)
+#			dx<-(max(inp)*1.2)-minx
+#			dy<-(max(out)*1.2)-miny
+
+			dx<-(max(inp)-min(inp))*1.2
+			dy<-(max(out)-min(out))*1.2
+			minx<-min(inp)-dx/12
+			miny<-min(out)-dy/12
+
+			title(main="RBF network");
+			polygon(c(540,620,620,540),c(550,550,600,600),col="lightblue2");
+			text(580,578,"EXIT",cex=0.9);
+			polygon(c(540,620,620,540),c(450,450,500,500),col="lightblue2");
+			text(580,478,"NETW",cex=0.9);
+
+			lines(c(40,40),c(20,620));
+			lines(c(40,640),c(20,20));
+
+			for(i in 0:6){
+				lines(c(30,50),c(100*i+20,100*i+20));
+				text(x=0,y=i*100+20,round(i/6*dy+miny,digit=3),cex=0.7);
+				lines(c(100*i+40,100*i+40),c(10,30));
+				text(x=i*100+40,y=0,round(i/6*dx+minx,digit=3),cex=0.7);
+			}
+
+
+			for(i in 0:600) lines(c(i+40,i+41),c((valuate3(minx+i/600*dx)-miny)/dy*600+20,(valuate3(minx+(i+1)/600*dx)-miny)/dy*600+20))
+			for(i in 1:length(inp)) points((inp[i]-minx)/dx*600+40,(valuate3(inp[i])-miny)/dy*600+20,col="red2")
+			for(i in 1:length(inp)) points((inp[i]-minx)/dx*600+40,(out[i]-miny)/dy*600+20,col="purple1")
+
+		}
+
+		gauss<-function(x,sigma) exp(-(x^2)/(2*sigma^2));
+
+		ident<-function(x) x;
+
+		identdif<-function(x) 1;
+	
+		v<-function(l,j) {vv<-0;for(i in 1:ls[l-1]) vv<-vv+val[[l-1]][i]*weigth[[l-1]][i,j];vv+dist[[l]][j]};
+
+
+#		valuate<-function(){
+#			value<-list();
+#			value[1]<-list(inp[watch,]);
+#			i<-2
+#			ee<-c();
+#			for(j in 1:ls[i]){
+#				e<-0;
+#				for(k in 1:ls[i-1]) 
+#					e<-e+abs((value[[i-1]][k]-weigth[[i-1]][k,j]));
+#				ee<-c(ee,gauss(e));
+#			}
+#			value[i]<-list(ee);
+#
+#			i<-3
+#			ee<-c();
+#			for(j in 1:ls[i]){
+#				e<-0;
+#				for(k in 1:ls[i-1]) 
+#					e<-e+value[[i-1]][k]*weigth[[i-1]][k,j];
+#				ee<-c(ee,ident(e)+dist[[i]][j]);
+#			}
+#			value[i]<-list(ee);
+#			
+#			value;
+#		}
+
+		valuate1<-function(watch){
+			value<-list();
+			value[1]<-list(inp[watch,]);
+			total<-0;
+			i<-2;
+
+			for(j in 1:ls[i]){
+				e<-0;
+				for(k in 1:ls[i-1]) 
+					e<-e+abs(value[[i-1]][k]-weigth[[i-1]][k,j]);
+				total<-total+gauss(e,ifelse((is.nan(sigma))&(ls[1]==1),dist[[i]][j],sigma));
+			}
+
+			ee<-c();
+			for(j in 1:ls[i]){
+				e<-0;
+				for(k in 1:ls[i-1]) 
+					e<-e+abs(value[[i-1]][k]-weigth[[i-1]][k,j]);
+				ee<-c(ee,ifelse(total!=0,gauss(e,ifelse(((is.nan(sigma))&(ls[1]==1)),dist[[i]][j],sigma))/total,0));
+			}
+			ee;
+		}
+
+		valuate2<-function(centre){
+			value<-list();
+			value[1]<-list(inp[watch,]);
+			value[2]<-list(centre[watch,]);
+			i<-3
+			ee<-c();
+			for(j in 1:ls[i]){
+				e<-0;
+				for(k in 1:ls[i-1]) 
+					e<-e+value[[i-1]][k]*weigth[[i-1]][k,j];
+				ee<-c(ee,ident(e+dist[[i]][j]));
+			}
+			value[i]<-list(ee);
+			
+			value;
+		}
+
+		valuate3<-function(pont){
+			value<-list();
+			value[1]<-list(pont);
+			i<-2;
+			total<-0;
+			ee<-c();
+
+
+			for(j in 1:ls[i]){
+				e<-0;
+				for(k in 1:ls[i-1]) 
+					e<-e+abs(value[[i-1]][k]-weigth[[i-1]][k,j]);
+				total<-total+gauss(e,ifelse((is.nan(sigma))&(ls[1]==1),dist[[i]][j],sigma));
+			}
+
+
+			for(j in 1:ls[i]){
+				e<-0;
+				for(k in 1:ls[i-1]) 
+					e<-e+abs(value[[i-1]][k]-weigth[[i-1]][k,j]);
+				ee<-c(ee,gauss(e,ifelse((is.nan(sigma))&(ls[1]==1),dist[[i]][j],sigma))/total);
+			}
+			value[i]<-list(ee);
+
+			i<-3
+			e<-0;
+			for(k in 1:ls[i-1]) 
+				e<-e+value[[i-1]][k]*weigth[[i-1]][k,1];
+			ident(e+dist[[i]][1]);
+		}
+
+
+		deltaz<-function(){
+			deltak<-list();
+				dd<-c()
+				for(j in 1:ls[3]){
+					dd<-c(dd,(out[watch,j]-val[[3]][j]));#*identdif(v(i,j)));
+				}
+				deltak[3]<-list(dd);
+			deltak;
+		}
+
+		permut<-function(v){
+			iter<-round(runif(1,min=20,max=40))
+			for(i in 1:iter){
+				j<-round(runif(1,min=1,max=length(v)))
+				k<-round(runif(1,min=1,max=length(v)))
+				change<-v[j]
+				v[j]<-v[k]
+				v[k]<-change
+			}
+			v;
+		}
+
+
+		clust<-function(sampl,k,iter=20){
+	
+			kozep<-rep(sampl[1],k)
+			set<-rep(1,length(sampl))
+		
+			for(i in 1:k)
+#				kozep[i]<-sampl[ceiling(length(sampl)/k*i)]
+				kozep[i]<-(max(sampl)-min(sampl))/k*i+min(sampl)
+
+			valt<-1;szamol<-0;
+			while((valt!=0)&(szamol<iter)){
+				valt<-0;szamol<-szamol+1;
+				for(i in 1:length(sampl)){
+					max<-abs(sampl[i]-kozep[set[i]]);
+					for(j in 1:k){
+						if (abs(sampl[i]-kozep[j])<max){
+							valt<-1;
+							max<-abs(sampl[i]-kozep[j]);
+							set[i]<-j;
+						}
+					}
+				}
+				for(i in 1:k){
+					summ<-0;cnt<-0;
+					for(j in 1:length(sampl))
+						if (set[j]==i){
+							summ<-summ+sampl[j];cnt<-cnt+1;
+						}
+					kozep[i]<-ifelse(cnt==0,0,summ/cnt);
+				}
+			}
+
+			kozep;
+		}
+
+
+
+		sigmaz<-function(){
+				sigmas<-c();
+				for(i in 1:ls[2]){
+					d<-0
+					for(j in 1:ls[2])
+						if (i!=j)
+							d<-c(d,weigth[[1]][j]-weigth[[1]][i]);
+					maxim<-max(d);
+					minim<-min(d);
+					for(j in 1:length(d)){
+						if ((d[j]<maxim)&(d[j]>0)) maxim<-d[j]
+						if ((d[j]>minim)&(d[j]<0)) minim<-d[j]
+					}
+					s<-max(abs(minim),maxim)/2		
+					sigmas<-c(sigmas,s)
+				}
+				sigmas;
+		}
+
+
+	
+	if ((length(neurons)!=1)|(neurons<=0)|(neurons%%1!=0)) return("Neuron must be one positive integer number");
+	err<-abs(err)
+	ls<-c(ncol(inp),neurons,ncol(out))
+	if (nrow(inp)!=nrow(out)) return("Different input and output sample length");
+	
+
+	weigth<-list()
+	for(i in 1:(length(ls)-1)) {weigth[i]<-list(matrix(c(0),ls[i],ls[i+1]))
+					if (i!=1)
+					for(j in 1:ls[i])
+						for(k in 1:ls[i+1])
+							weigth[[i]][j,k]<-runif(1,min=-1,max=1)
+				    }
+
+	dist<-list();
+	dist[1]<-list()
+	dist[2]<-list(rep(0,ls[2]))
+	dist[3]<-list(rep(1,ls[3]))
+	for(j in 1:ls[3]) dist[[3]][j]<-runif(1,min=-1,max=1);
+
+
+	if (visual){
+		cordx<-list();cordy<-list();
+		for(i in 1:length(ls)){
+			xc<-c();yc<-c();
+			for(j in 1:ls[i]){
+				xc<-c(xc,300-length(ls)*80+i*160);
+				yc<-c(yc,300+ls[i]*30-j*60);
+			}
+			cordx[i]<-list(xc);cordy[i]<-list(yc);
+		}
+	}
+
+	
+
+	centre<-matrix(1,nrow(inp),ls[2])
+	for(watch in 1:nrow(inp))	centre[watch,]<-valuate1(watch);
+
+	watch<-1;
+	val<-valuate2(centre);
+	run<-FALSE;
+	error<-NaN;
+	if (visual) drawnet(run);
+	
+	ext<-FALSE;valt<-FALSE;graf<-FALSE;
+	while(!ext){		
+		if (visual){ coor<-locator(1);
+			if ((coor$x>540)&(coor$x<620)&(coor$y>450)&(coor$y<520)&(run)&(ncol(inp)==1)){
+				graf<-!graf;
+				if (graf) graph()
+				   else drawnet(run);
+			}
+		}
+		else{
+			coor<-list(x=0,y=0);
+		}
+
+		if ((!visual)|(coor$x>540)&(coor$x<620)&(coor$y>550)&(coor$y<620)){
+			if (!run) {
+				if (visual){
+					polygon(c(100,500,500,100),c(350,350,250,250),col="ivory2");
+					text(300,300,"clustering",cex=2);
+				}
+
+				if (nrow(inp)>=neurons){
+					for(i in 1:ncol(inp))
+						weigth[[1]][i,]<-clust(inp[,i],neurons);
+				}
+				else
+					for(i in 1:ncol(inp))
+						weigth[[1]][i,]<-kmeans(inp[,i],neurons)$centers[,1];
+
+				
+				if ((is.nan(sigma))&(ls[1]==1)) dist[2]<-list(sigmaz());
+
+				for(i in 1:nrow(inp)) centre[i,]<-valuate1(i);
+				val<-valuate2(centre);
+				if (visual) drawnet(run);
+				iter=0;
+				
+				if (!is.na(it)&(it!=0))
+				while ((iter<it)&((is.na(error))|(error>err))){
+					iter<-iter+1;				
+					if (visual){
+						polygon(c(75,160,160,75),c(45,45,85,85),col="turquoise");
+						text(170,67,iter,pos=2,cex=0.9);
+						polygon(c(75,160,160,75),c(5,5,45,45),col="turquoise");
+						text(170,27,round(error*10^(4-max(round(log10(error)),0)))/10^(4-max(round(log10(error)),0)),pos=2,cex=0.9);
+					}
+			
+					if (permute) perm<-permut(1:nrow(inp)) else perm<-1:nrow(inp);
+					w2<-weigth;
+					t2<-dist;
+					error<-0
+					for(ii in 1:nrow(inp)){
+						watch<-perm[ii];
+						val<-valuate2(centre);
+						error<-error+abs(ifelse(is.na(val[[3]]),0,val[[3]])-out[watch]);
+						delta<-deltaz();
+						for(k in (length(ls)-1):2){
+							for(i in 1:ls[k])
+								for(j in 1:ls[k+1]){
+									valtoz<-alfa*delta[[k+1]][j]*val[[k]][i];
+									w2[[k]][i,j]<-w2[[k]][i,j]+valtoz;
+								}							
+							for(j in 1:ls[k+1])
+								if (online) dist[[k+1]][j]<-dist[[k+1]][j]+alfa*delta[[k+1]][j]
+								else t2[[k+1]][j]<-t2[[k+1]][j]+alfa*delta[[k+1]][j];
+						}
+						if (online) weigth<-w2;
+					}
+					error<-error/nrow(inp);
+					if (!online){ weigth<-w2;dist<-t2;}
+				}
+
+		
+				watch<-1;
+				run<-TRUE;val<-valuate2(centre);
+				if (visual) drawnet(run)
+				else ext<-TRUE;
+			}
+			else ext<-TRUE;
+		}
+
+		if (visual){
+			if ((coor$x>0)&(coor$x<65)&(coor$y>87)&(coor$y<125)&(!graf)){
+				watch<-ifelse(watch>1,watch-1,1);val<-valuate2(centre);drawnet(run);
+			}
+			if ((coor$x>80)&(coor$x<145)&(coor$y>87)&(coor$y<125)&(!graf)){
+				watch<-ifelse(watch<nrow(inp),watch+1,nrow(inp));val<-valuate2(centre);drawnet(run);
+			}
+			if ((valt)&(!graf)) {
+				cordx[[vi]][vj]<-coor$x;cordy[[vi]][vj]<-coor$y;valt=FALSE;
+				drawnet(run);
+			}
+			else
+			{
+			for(i in 1:length(cordx))
+				for(j in 1:length(cordx[[i]]))
+					if ((coor$x>cordx[[i]][j])&(coor$x<cordx[[i]][j]+30)&(coor$y>cordy[[i]][j])&(coor$y<cordy[[i]][j]+30)&(!graf)){
+						valt<-TRUE;
+						vi<-i;vj<-j;
+					}
+			}
+		}
+	}
+
+	reslt<-list(weigth=weigth,dist=dist,neurons=ls,sigma=sigma);
+	reslt;
+}
