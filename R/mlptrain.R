@@ -109,18 +109,6 @@ mlptrain<-function(inp,neurons,out,alfa=0.2,it=200,online=TRUE,permute=TRUE,thre
 			deltak;
 		}
 
-		permut<-function(v){
-			iter<-round(runif(1,min=20,max=40))
-			for(i in 1:iter){
-				j<-round(runif(1,min=1,max=length(v)))
-				k<-round(runif(1,min=1,max=length(v)))
-				change<-v[j]
-				v[j]<-v[k]
-				v[k]<-change
-			}
-			v;
-		}
-
 	if (neurons==0) neurons<-c()
 
 	ls<-c(ncol(inp),neurons,ncol(out))
@@ -223,7 +211,7 @@ mlptrain<-function(inp,neurons,out,alfa=0.2,it=200,online=TRUE,permute=TRUE,thre
 						text(170,37,iter,pos=2,cex=0.9);
 					}
 			
-					if (permute) perm<-permut(1:nrow(inp)) else perm<-1:nrow(inp);
+					if (permute) perm<-sample(nrow(inp),nrow(inp)) else perm<-1:nrow(inp);
 					w2<-weigth;
 					t2<-dist;
 					for(ii in 1:nrow(inp)){
