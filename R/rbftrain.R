@@ -206,18 +206,6 @@ rbftrain<-function(inp,neurons,out,alfa=0.2,it=40,err=0,sigma=1,online=TRUE,perm
 			deltak;
 		}
 
-		permut<-function(v){
-			iter<-round(runif(1,min=20,max=40))
-			for(i in 1:iter){
-				j<-round(runif(1,min=1,max=length(v)))
-				k<-round(runif(1,min=1,max=length(v)))
-				change<-v[j]
-				v[j]<-v[k]
-				v[k]<-change
-			}
-			v;
-		}
-
 
 		clust<-function(sampl,k,iter=20){
 	
@@ -338,7 +326,7 @@ rbftrain<-function(inp,neurons,out,alfa=0.2,it=40,err=0,sigma=1,online=TRUE,perm
 			if (!run) {
 				if (visual){
 					polygon(c(100,500,500,100),c(350,350,250,250),col="ivory2");
-					text(300,300,"clustering",cex=2);
+					text(300,300,"Clustering",cex=2);
 				}
 
 				if (nrow(inp)>=neurons){
@@ -359,7 +347,7 @@ rbftrain<-function(inp,neurons,out,alfa=0.2,it=40,err=0,sigma=1,online=TRUE,perm
 				
 				if (!is.na(it)&(it!=0))
 				while ((iter<it)&((is.na(error))|(error>err))){
-					iter<-iter+1;				
+					iter<-iter+1;
 					if (visual){
 						polygon(c(75,160,160,75),c(45,45,85,85),col="turquoise");
 						text(170,67,iter,pos=2,cex=0.9);
@@ -367,7 +355,7 @@ rbftrain<-function(inp,neurons,out,alfa=0.2,it=40,err=0,sigma=1,online=TRUE,perm
 						text(170,27,round(error*10^(4-max(round(log10(error)),0)))/10^(4-max(round(log10(error)),0)),pos=2,cex=0.9);
 					}
 			
-					if (permute) perm<-permut(1:nrow(inp)) else perm<-1:nrow(inp);
+					if (permute) perm<-sample(nrow(inp),nrow(inp)) else perm<-1:nrow(inp);
 					w2<-weigth;
 					t2<-dist;
 					error<-0

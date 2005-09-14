@@ -1,4 +1,4 @@
-mlp<-function(inp,weigth,dist,neurons,actfns=c()){
+mlp<-function(inp,weigth,dist,neurons,actfns=c(),layer=NaN){
 
 		sigmoid<-function(x) 1/(1+exp(-x));
 
@@ -11,7 +11,7 @@ mlp<-function(inp,weigth,dist,neurons,actfns=c()){
 		valuate<-function(fnc){
 			value<-list();
 			value[1]<-list(inp[watch,]);
-			for(i in 2:length(neurons)){
+			for(i in 2:layer){
 				ee<-c();
 				for(j in 1:neurons[i]){
 					e<-0;
@@ -20,22 +20,25 @@ mlp<-function(inp,weigth,dist,neurons,actfns=c()){
 				}
 				value[i]<-list(ee);
 			}
-			value[[length(neurons)]];
+			value[[layer]];
 		}
 
-	if ((length(neurons)!=length(actfns)+1)&(length(actfns)>0)) return("The number of activation function must be the same as the number of layers");
+	if ((length(neurons)!=length(actfns)+1)&(length(actfns)>0)) return("The number of activation function must be the same as the number of layer");
 	if (length(actfns)!=0){
 		fnd<-FALSE;
 		for(i in 1:length(actfns)) 
 			if ((actfns[i]!=1)&(actfns[i]!=2)&(actfns[i]!=3)&(actfns[i]!=4)) fnd<-TRUE;
 		if (fnd) return("The code of the activation functions must be integer and must be between 1-4");
 	}
+	if ((is.na(layer))|(layer>=length(neurons))) layer<-length(neurons)
+	if (layer<1) layer<-1;
+	if (layer==1) return(inp);
 
 	fnc<-c();
 
 	if (length(actfns)>0){
 		fnctype<-actfns;
-		for(i in 1:(length(neurons)-1)){
+		for(i in 1:(layer-1)){
 				if(fnctype[i]==1) {fnc<-c(fnc,sigmoid);}
 				if(fnctype[i]==2) {fnc<-c(fnc,tanhip);}
 				if(fnctype[i]==3) {fnc<-c(fnc,gauss);}
@@ -43,8 +46,8 @@ mlp<-function(inp,weigth,dist,neurons,actfns=c()){
 			}
 	}
 	else{
-		for(i in 1:length(neurons)-1) fnc<-c(fnc,sigmoid)
-		fnctype<-rep(1,times=length(neurons)-1)
+		for(i in 1:(layer-1)) fnc<-c(fnc,sigmoid)
+		fnctype<-rep(1,times=(layer-1))
 	}
 
 	reslt<-c()

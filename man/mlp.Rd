@@ -5,7 +5,7 @@
 
 \description{The recalling method of the MLP network which was trained by the mlptrain function.}
 
-\usage{	mlp(inp,weigth,dist,neurons,actfns)}
+\usage{	mlp(inp,weigth,dist,neurons,actfns=c(),layer=NaN)}
 
 \arguments{
 	\item{inp}{a matrix that contains one input data in each row.}
@@ -21,6 +21,8 @@
 			2: Hyperbolic tangent function
 			3: Gauss function
 			4: Identical function.}
+	\item{layer}{the number of the layer as far as the function is calculating. If the value is NaN, the function will calculate till the output layer.
+		     It can be useful if you need the output of one of the hidden layers.}
 }
 
 \value{ a matrix that contains the response data of the network, each row contains one response.}
