@@ -61,12 +61,12 @@
 	out parameters. The inp and out parameters has to be the same
 	number of rows, otherwise the function will stop with an error message. 
 
-	If you use the weigth or dist argument, than that variables won`t be determined by random. 
+	If you use the weigth or dist argument, than that variables won't be determined by random. 
         This could be useful if you want to retrain your network. In that case use both of this two arguments. 
         
 	From this vesion of the package there is the chance to use your own activation functions, by using the actfns
-	argument. If you do this, don`t forget to set the differential of the activation functions in the diffact argument at 
-	the same order and the same position where you are using the new activation function. (No need of using the diffact argument if you`re using
+	argument. If you do this, don't forget to set the differential of the activation functions in the diffact argument at 
+	the same order and the same position where you are using the new activation function. (No need of using the diffact argument if you're using
 	the preset activation functions.)
  
 	The function has a graphical user interface that can be switched on and off using
