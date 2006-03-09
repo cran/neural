@@ -1,11 +1,11 @@
-mlptrain<-function(inp,neurons,out,alfa=0.2,it=200,online=TRUE,permute=TRUE,thresh=0,dthresh=0.1,actfns=c(),visual=TRUE){
+mlptrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=200,online=TRUE,permute=TRUE,thresh=0,dthresh=0.1,actfns=c(),diffact=c(),visual=TRUE){
 		rect<-function(x,y,value){
 			xx<-c(x,x+30,x+30,x)
 			yy<-c(y,y,y+30,y+30)
 			polygon(xx,yy,col=ifelse(value<=dthresh,"red","green"));
 		}
 
-		drawnet<-function(lefut=FALSE,conn=TRUE,fnctype=rep(1,times=length(ls)-1)){
+		drawnet<-function(lefut=FALSE,conn=TRUE,fnctype=as.list(rep(1,times=length(ls)-1))){
 			plot(1:600,1:600,xlab="",ylab="",type="n",axes=FALSE);
 			title(main="MLP Network");
 			polygon(c(0,65,65,0),c(115,115,75,75),col="lightblue2");
@@ -39,10 +39,11 @@ mlptrain<-function(inp,neurons,out,alfa=0.2,it=200,online=TRUE,permute=TRUE,thre
 					cx<-cordx[[i]][length(cordx[[i]])/2+1];
 					cy<-cordy[[i]][length(cordy[[i]])/2+1];
 					polygon(c(cx+45,cx+115,cx+115,cx+45),c(cy+35,cy+35,cy,cy),col="ivory");
-					if(fnctype[i]==1) text(cx+40,cy+17,"SZIGM",pos=4,cex=0.7);
-					if(fnctype[i]==2) text(cx+40,cy+17,"TANHIP",pos=4,cex=0.7);
-					if(fnctype[i]==3) text(cx+40,cy+17,"EXP",pos=4,cex=0.7);
-					if(fnctype[i]==4) text(cx+40,cy+17,"IDENT",pos=4,cex=0.7);
+					if(fnctype[[i]]==1) text(cx+40,cy+17,"SZIGM",pos=4,cex=0.7);
+					if(fnctype[[i]]==2) text(cx+40,cy+17,"TANHIP",pos=4,cex=0.7);
+					if(fnctype[[i]]==3) text(cx+40,cy+17,"EXP",pos=4,cex=0.7);
+					if(fnctype[[i]]==4) text(cx+40,cy+17,"IDENT",pos=4,cex=0.7);
+					if(fnctype[[i]]==5) text(cx+40,cy+17,"USER",pos=4,cex=0.7);
 				}
 			}
 
@@ -57,22 +58,22 @@ mlptrain<-function(inp,neurons,out,alfa=0.2,it=200,online=TRUE,permute=TRUE,thre
 
 		}
 
-		sigmoid<-function(x) 1/(1+exp(-x));
+		sigmoid<-function(x) {1/(1+exp(-x))}
 
-		sigmoiddif<-function(x) (sigmoid(x)*(1-sigmoid(x)));
-			##exp(-x)/((1+exp(-x))^2);
+		sigmoiddif<-function(x) {(sigmoid(x)*(1-sigmoid(x)))}
+			##{exp(-x)/((1+exp(-x))^2)}
 
-		tanhip<-function(x) (1-exp(-2*x))/(1+exp(-2*x));
+		tanhip<-function(x) {(1-exp(-2*x))/(1+exp(-2*x))}
 
-		tanhipdif<-function(x) 1-tanhip(x)^2;
+		tanhipdif<-function(x) {1-tanhip(x)^2}
 
-		gauss<-function(x) exp(-(x^2)/2);
+		gauss<-function(x) {exp(-(x^2)/2)}
 
-		gaussdif<-function(x) -x*gauss(x);
+		gaussdif<-function(x) {-x*gauss(x)}
 
-		ident<-function(x) x;
+		ident<-function(x) {x}
 
-		identdif<-function(x) 1;
+		identdif<-function(x) {1}
 	
 		v<-function(l,j) {vv<-0;for(i in 1:ls[l-1]) vv<-vv+val[[l-1]][i]*weigth[[l-1]][i,j];vv+dist[[l]][j]};
 
@@ -113,27 +114,52 @@ mlptrain<-function(inp,neurons,out,alfa=0.2,it=200,online=TRUE,permute=TRUE,thre
 
 	ls<-c(ncol(inp),neurons,ncol(out))
 
+	actfns<-as.list(actfns)
+
 	if (nrow(inp)!=nrow(out)) return("Different input and output sample number");
+
 	if ((length(ls)!=length(actfns)+1)&(length(actfns)>0)) return("Different activation function and active layer number");
+
 	if (length(actfns)!=0){
 		talal<-FALSE;
-		for(i in 1:length(actfns)) 
-			if ((actfns[i]!=1)&(actfns[i]!=2)&(actfns[i]!=3)&(actfns[i]!=4)) talal<-TRUE;
-		if (talal) return("Activation functions is a vector and each element of the vector must be between 1-4.");
+		for(i in 1:length(actfns)){ 
+			if (is.function(actfns[[i]])){
+				if (!is.function(diffact[[i]])) return(paste("There is a function in actfns[",i,"], but the differential function is missing in diffact.",sep=""));
+			}	
+			else if ((actfns[[i]]!=1)&(actfns[[i]]!=2)&(actfns[[i]]!=3)&(actfns[[i]]!=4)) talal<-TRUE;
+		}
+		if (talal) return("Activation functions is a vector and each element of the vector must be between 1-4 or must be a function.");
+	}
+	
+	if (length(weigth)!=0){
+		if (length(weigth)!=length(ls)-1) return("The weigth arguments length must be equal with the number of active layers.")
+		for(i in 1:(length(ls)-1)){
+			if (nrow(weigth[[i]])!=ls[i]) return(paste("The number of rows is different in weigth[",i,"].",sep=""));
+			if (ncol(weigth[[i]])!=ls[i+1]) return(paste("The number of column is different in weigth[",i,"].",sep=""));
+		}
+	}
+	else{	
+		weigth<-list()
+		for(i in 1:(length(ls)-1)) {weigth[i]<-list(matrix(c(0),ls[i],ls[i+1]))
+						for(j in 1:ls[i])
+							for(k in 1:ls[i+1])
+								weigth[[i]][j,k]<-runif(1,min=-1,max=1)
+				    	}
 	}
 
-	weigth<-list()
-	for(i in 1:(length(ls)-1)) {weigth[i]<-list(matrix(c(0),ls[i],ls[i+1]))
-					for(j in 1:ls[i])
-						for(k in 1:ls[i+1])
-							weigth[[i]][j,k]<-runif(1,min=-1,max=1)
-				    }
-
-	dist<-list()
-	for(i in 2:length(ls)) {k<-c()
-				for(j in 1:ls[i]) k<-c(k,runif(1,min=-1,max=1))
-				dist[i]<-list(k);
-				}
+	if (length(dist)!=0){
+		if (length(dist)!=length(ls)) return("The dist arguments length must be equal with the number of layers.")
+		for(i in 2:(length(ls))){
+			if (length(dist[[i]])!=ls[i]) return(paste("The length of the distortion is different in dist[",i,"]",sep=""));
+		}
+	}
+	else{
+		dist<-list()
+		for(i in 2:length(ls)) {k<-c()
+					for(j in 1:ls[i]) k<-c(k,runif(1,min=-1,max=1))
+						dist[i]<-list(k);
+					}
+	}
 
 	if (visual){
 		cordx<-list();cordy<-list();
@@ -150,24 +176,26 @@ mlptrain<-function(inp,neurons,out,alfa=0.2,it=200,online=TRUE,permute=TRUE,thre
 
 	watch<-1;
 	fnc<-c();
+	fncdif<-c();
 
 	if (length(actfns)>0){
 		fnctype<-actfns;
 		for(i in 1:(length(ls)-1)){
-				if(fnctype[i]==1) {fnc<-c(fnc,sigmoid);}
-				if(fnctype[i]==2) {fnc<-c(fnc,tanhip);}
-				if(fnctype[i]==3) {fnc<-c(fnc,gauss);}
-				if(fnctype[i]==4) {fnc<-c(fnc,ident);}
+				if(is.function(fnctype[[i]])) {fnctype[[i]]<-5;fnc<-c(fnc,actfns[[i]])}
+				if(fnctype[[i]]==1) fnc<-c(fnc,sigmoid)
+				if(fnctype[[i]]==2) fnc<-c(fnc,tanhip)
+				if(fnctype[[i]]==3) fnc<-c(fnc,gauss)
+				if(fnctype[[i]]==4) fnc<-c(fnc,ident)
 			}
 	}
 	else{
-		for(i in 1:length(ls)-1) fnc<-c(fnc,sigmoid)
-		fnctype<-rep(1,times=length(ls)-1)
+		for(i in 1:(length(ls)-1)) fnc<-c(fnc,sigmoid)
+		fnctype<-as.list(rep(1,times=length(ls)-1))
 	}
 	val<-valuate(fnc);
 	lefut<-FALSE;
 	conn<-TRUE;
-
+	
 	if (visual) drawnet(lefut,conn,fnctype);
 	
 	ext<-FALSE;valt<-FALSE;
@@ -178,27 +206,27 @@ mlptrain<-function(inp,neurons,out,alfa=0.2,it=200,online=TRUE,permute=TRUE,thre
 		if ((!conn)&&(visual)){
 			for(i in 1:(length(ls)-1)){
 				if((coor$x>cordx[[i]][length(cordx[[i]])/2+1]+45)&(coor$x<cordx[[i]][length(cordx[[i]])/2+1]+115)
-				  &(coor$y>cordy[[i]][length(cordy[[i]])/2+1])&(coor$y<cordy[[i]][length(cordy[[i]])/2+1]+35)){
-				fnctype[i]<-fnctype[i]%%4+1;
+				  &(coor$y>cordy[[i]][length(cordy[[i]])/2+1])&(coor$y<cordy[[i]][length(cordy[[i]])/2+1]+35)&(fnctype[[i]]!=5)){
+				fnctype[[i]]<-fnctype[[i]]%%4+1;
 				cx<-cordx[[i]][length(cordx[[i]])/2+1];
 				cy<-cordy[[i]][length(cordy[[i]])/2+1];
 				polygon(c(cx+45,cx+115,cx+115,cx+45),c(cy+35,cy+35,cy,cy),col="ivory");
-				if(fnctype[i]==1) text(cx+40,cy+17,"SZIGM",pos=4,cex=0.7);
-				if(fnctype[i]==2) text(cx+40,cy+17,"TANHIP",pos=4,cex=0.7);
-				if(fnctype[i]==3) text(cx+40,cy+17,"EXP",pos=4,cex=0.7);
-				if(fnctype[i]==4) text(cx+40,cy+17,"IDENT",pos=4,cex=0.7);
+				if(fnctype[[i]]==1) text(cx+40,cy+17,"SZIGM",pos=4,cex=0.7);
+				if(fnctype[[i]]==2) text(cx+40,cy+17,"TANHIP",pos=4,cex=0.7);
+				if(fnctype[[i]]==3) text(cx+40,cy+17,"EXP",pos=4,cex=0.7);
+				if(fnctype[[i]]==4) text(cx+40,cy+17,"IDENT",pos=4,cex=0.7);				
 				}
 			}
 		}
 		if ((!visual)|(coor$x>540)&(coor$x<600)&(coor$y>550)&(coor$y<600)){
 			if (!lefut) {
 				fnc<-c()
-				fncdif<-c()
-				for(i in 1:(length(fnctype))){
-					if(fnctype[i]==1) {fnc<-c(fnc,sigmoid);fncdif<-c(fncdif,sigmoiddif);}
-					if(fnctype[i]==2) {fnc<-c(fnc,tanhip);fncdif<-c(fncdif,tanhipdif);}
-					if(fnctype[i]==3) {fnc<-c(fnc,gauss);fncdif<-c(fncdif,gaussdif);}
-					if(fnctype[i]==4) {fnc<-c(fnc,ident);fncdif<-c(fncdif,identdif);}
+				for(i in 1:length(fnctype)){
+					if(fnctype[[i]]==1) {fnc<-c(fnc,sigmoid);fncdif<-c(fncdif,sigmoiddif);}
+					if(fnctype[[i]]==2) {fnc<-c(fnc,tanhip);fncdif<-c(fncdif,tanhipdif);}
+					if(fnctype[[i]]==3) {fnc<-c(fnc,gauss);fncdif<-c(fncdif,gaussdif);}
+					if(fnctype[[i]]==4) {fnc<-c(fnc,ident);fncdif<-c(fncdif,identdif);}
+					if(fnctype[[i]]==5) {fnc<-c(fnc,actfns[[i]]);fncdif<-c(fncdif,diffact[[i]]);}
 				}
 				
 				if (!is.na(it)&(it!=0)){
@@ -217,7 +245,6 @@ mlptrain<-function(inp,neurons,out,alfa=0.2,it=200,online=TRUE,permute=TRUE,thre
 					for(ii in 1:nrow(inp)){
 						watch<-perm[ii];
 						val<-valuate(fnc);
-
 						delta<-deltaz(fnc,fncdif);
 						for(k in (length(ls)-1):1){
 							for(i in 1:ls[k])
@@ -282,5 +309,6 @@ mlptrain<-function(inp,neurons,out,alfa=0.2,it=200,online=TRUE,permute=TRUE,thre
 			}
 		}
 	}
-	list(weigth=weigth,dist=dist,neurons=ls,actfns=fnctype);
+	
+	list(weigth=weigth,dist=dist,neurons=ls,actfns=fnc,diffact=fncdif);
 }
