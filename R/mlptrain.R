@@ -6,14 +6,14 @@ mlptrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=200,online=TR
 		}
 
 		drawnet<-function(lefut=FALSE,conn=TRUE,fnctype=as.list(rep(1,times=length(ls)-1))){
-			plot(1:600,1:600,xlab="",ylab="",type="n",axes=FALSE);
+			plot(1:700,1:700,xlab="",ylab="",type="n",axes=FALSE);
 			title(main="MLP Network");
 			polygon(c(0,65,65,0),c(115,115,75,75),col="lightblue2");
 			text(32,99,"Prev",cex=0.9);
 			polygon(c(80,145,145,80),c(115,115,75,75),col="lightblue2");
 			text(112,99,"Next",cex=0.9);
-			polygon(c(540,620,620,540),c(550,550,600,600),col="lightblue2");
-			text(580,578,ifelse(lefut==FALSE,"START","EXIT"),cex=0.9);
+			polygon(c(640,720,720,640),c(650,650,700,700),col="lightblue2");
+			text(680,678,ifelse(lefut==FALSE,"START","EXIT"),cex=0.8);
 			text(25,40,"Iteration:",cex=0.9);
 			polygon(c(75,160,160,75),c(15,15,55,55),col="turquoise");
 			polygon(c(160,240,240,160),c(15,15,55,55),col="snow3");
@@ -29,7 +29,7 @@ mlptrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=200,online=TR
 							xx<-c(cordx[[i]][j]+30,cordx[[i+1]][k]);
 							yy<-c(cordy[[i]][j]+15,cordy[[i+1]][k]+15);
 							lines(xx,yy,col="blue");
-							text((xx[1]+xx[2])/2,(yy[1]+yy[2])/2,round(weigth[[i]][j,k]*100)/100)
+							text((xx[1]+xx[2])/2,(yy[1]+yy[2])/2,round(weigth[[i]][j,k]*100)/100,cex=0.8)
 						}
 					}
 				}
@@ -51,8 +51,8 @@ mlptrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=200,online=TR
 				for(j in 1:length(cordx[[i]])){
 					rect(cordx[[i]][j],cordy[[i]][j],ifelse(i==length(cordx),abs(out[watch,j]-val[[i]][j]),dthresh+1));
 					if (i==1)
-						text(cordx[[i]][j]-10,cordy[[i]][j]+10,round(val[[i]][j]*100)/100,pos=1)
-					else text(cordx[[i]][j]+40,cordy[[i]][j]+10,round(val[[i]][j]*100)/100,pos=1);
+						text(cordx[[i]][j]-10,cordy[[i]][j]+10,round(val[[i]][j]*100)/100,pos=1,cex=0.8)
+					else text(cordx[[i]][j]+40,cordy[[i]][j]+10,round(val[[i]][j]*100)/100,pos=1,cex=0.8);
 				}
 			}
 
@@ -166,8 +166,8 @@ mlptrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=200,online=TR
 		for(i in 1:length(ls)){
 			xc<-c();yc<-c();
 			for(j in 1:ls[i]){
-				xc<-c(xc,300-length(ls)*80+i*160);
-				yc<-c(yc,300+ls[i]*30-j*60);
+				xc<-c(xc,350-length(ls)*80+i*160);
+				yc<-c(yc,350+ls[i]*30-j*60);
 			}
 			cordx[i]<-list(xc);cordy[i]<-list(yc);
 		}
@@ -218,7 +218,7 @@ mlptrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=200,online=TR
 				}
 			}
 		}
-		if ((!visual)|(coor$x>540)&(coor$x<600)&(coor$y>550)&(coor$y<600)){
+		if ((!visual)|(coor$x>640)&(coor$x<700)&(coor$y>650)&(coor$y<700)){
 			if (!lefut) {
 				fnc<-c()
 				for(i in 1:length(fnctype)){

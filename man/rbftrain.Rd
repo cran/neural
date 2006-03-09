@@ -6,7 +6,7 @@
 \description{A simple RBF neural network which suitable for approximation.}
 
 \usage{	rbftrain(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=40,err=0,
-        sigma=1,online=TRUE,permute=TRUE,visual=TRUE)
+        sigma=NaN,online=TRUE,permute=TRUE,visual=TRUE)
 }
 
 \arguments{
@@ -42,14 +42,18 @@
 	it using the back-propagation algorithm using the inp and out parameter. This two parameters row number must be the same, else the
 	function will stop with an error message. 
 
-	If you use the weigth or dist argument, than that variables won`t be determined by random. 
+	If you use the weigth or dist argument, than that variables won't be determined by random. 
         This could be useful if you want to retrain your network. In that case use both of this two arguments in the same time. 
 
-	The function works with normalized Gauss-functions, whose width parameter will be the sigma argument. If the sigma argument is 0, then
-	the width of each Gauss function will be the half of the distance between the two nearest training samples.
+	The function works with normalized Gauss-functions, whose width parameter will be the sigma argument. If you want to give the values, this argument 
+	should be a matrix, with rows equal the number of neurons in the first layer, and columns equal the number of neurons in the second layer. 
+	If the sigma argument is NaN, then the width of each Gauss function will be the half of the distance between the two nearest training samples. If the sigma argument is exactly one number, 
+	then all sigma value will be that exact number. 
+
 	The function has a graphical user interface that can be switched
 	on and off, with the visual argument. If the graphical user interface is on, then the function could
-	show the result of the approximation in a co-ordinate system.
+	show the result of the approximation in a co-ordinate system, if it's a function with one parameter.
+ 
 	The result of the function is the parameters of the trained RBF neural network. Use the rbf function for information recall.
 }
 
@@ -59,7 +63,7 @@
 
 	x<-t(matrix(-5:10*24,1,16));
 	y<-t(matrix(sin(pi/180*(-5:10*24)),1,16));
-	neurons<-16;
+	neurons<-8;
 	\dontrun{
 	data<-rbftrain(x,neurons,y,sigma=NaN)
 	rbf(x,data$weigth,data$dist,data$neurons,data$sigma)
