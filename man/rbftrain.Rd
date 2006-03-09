@@ -45,9 +45,9 @@
 	If you use the weigth or dist argument, than that variables won't be determined by random. 
         This could be useful if you want to retrain your network. In that case use both of this two arguments in the same time. 
 
-	The function works with normalized Gauss-functions, whose width parameter will be the sigma argument. If you want to give the values, this argument 
+	The function works with normalized Gauss-functions, which width parameter will be the sigma argument. If you want to give the values, this argument 
 	should be a matrix, with rows equal the number of neurons in the first layer, and columns equal the number of neurons in the second layer. 
-	If the sigma argument is NaN, then the width of each Gauss function will be the half of the distance between the two nearest training samples. If the sigma argument is exactly one number, 
+	If the sigma argument is NaN, then the width of each Gauss function will be the half of the distance between the two nearest training samples times 1,1. If the sigma argument is exactly one number, 
 	then all sigma value will be that exact number. 
 
 	The function has a graphical user interface that can be switched

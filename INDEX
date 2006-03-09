@@ -2,3 +2,6 @@ mlp                     MLP neural network recalling method
 mlptrain                MLP neural network training method
 rbf                     RBF neural network recalling method
 rbftrain                RBF neural network training method
+letters_train		dataset for pattern recognizing
+letters_out		dataset for pattern recognizing
+letters_recall		dataset for pattern recognizing

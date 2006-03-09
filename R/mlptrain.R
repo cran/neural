@@ -211,10 +211,10 @@ mlptrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=200,online=TR
 				cx<-cordx[[i]][length(cordx[[i]])/2+1];
 				cy<-cordy[[i]][length(cordy[[i]])/2+1];
 				polygon(c(cx+45,cx+115,cx+115,cx+45),c(cy+35,cy+35,cy,cy),col="ivory");
-				if(fnctype[[i]]==1) text(cx+40,cy+17,"SZIGM",pos=4,cex=0.7);
-				if(fnctype[[i]]==2) text(cx+40,cy+17,"TANHIP",pos=4,cex=0.7);
-				if(fnctype[[i]]==3) text(cx+40,cy+17,"EXP",pos=4,cex=0.7);
-				if(fnctype[[i]]==4) text(cx+40,cy+17,"IDENT",pos=4,cex=0.7);				
+				if(fnctype[[i]]==1) {text(cx+40,cy+17,"SZIGM",pos=4,cex=0.7);fnc[[i]]<-sigmoid}
+				if(fnctype[[i]]==2) {text(cx+40,cy+17,"TANHIP",pos=4,cex=0.7);fnc[[i]]<-tanhip}
+				if(fnctype[[i]]==3) {text(cx+40,cy+17,"EXP",pos=4,cex=0.7);fnc[[i]]<-gauss}
+				if(fnctype[[i]]==4) {text(cx+40,cy+17,"IDENT",pos=4,cex=0.7);fnc[[i]]<-ident}			
 				}
 			}
 		}
@@ -292,7 +292,7 @@ mlptrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=200,online=TR
 				watch<-ifelse(watch<nrow(inp),watch+1,nrow(inp));val<-valuate(fnc);drawnet(lefut,conn,fnctype);
 			}
 			if ((coor$x>10)&(coor$x<90)&(coor$y>190)&(coor$y<230)){
-				conn<-!conn;drawnet(lefut,conn,fnctype);
+				conn<-!conn;val<-valuate(fnc);drawnet(lefut,conn,fnctype);
 			}
 			if (valt) {
 				cordx[[vi]][vj]<-coor$x;cordy[[vi]][vj]<-coor$y;valt=FALSE;
