@@ -5,15 +5,15 @@
 
 \description{A simple RBF neural network which suitable for approximation.}
 
-\usage{	rbftrain(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=40,err=0,
-        sigma=NaN,online=TRUE,permute=TRUE,visual=TRUE)
+\usage{	rbftrain(inp,neurons,out,weight=c(),dist=c(),alfa=0.2,it=40,err=0,
+        sigma=NaN,online=TRUE,permute=TRUE,visual=TRUE, ...)
 }
 
 \arguments{
 	\item{inp}{a matrix that contains one input data in each row.}
 	\item{neurons}{the number of neurons in the hidden layer.}
 	\item{out}{a matrix that contains one output data in each row.}
-	\item{weigth}{the starting weigths of the network.}
+	\item{weight}{the starting weights of the network.}
 	\item{dist}{the starting distortions of the network.}
 	\item{alfa}{the learning-rate parameter of the back-propagation algorithm.}
 	\item{it}{the maximum number of training iterations.}
@@ -25,11 +25,12 @@
 	\item{permute}{if TRUE the algorithm will use a random
 	  permutation of the input data in each epoch.}
 	\item{visual}{a logical value, that switches on/off the graphical user interface.}
+	\item{\dots}{currently not used...}
 }
 
 \value{
 	list with 4 argument
-	\item{weigth}{the weights of the network.}
+	\item{weight}{the weights of the network.}
 	\item{dist}{the distortion of the network.}
 	\item{neurons}{a numeric vector with length equals to the number of layers in the network, and
 			the ith layer will contains neurons[i] neuron.}
@@ -42,7 +43,7 @@
 	it using the back-propagation algorithm using the inp and out parameter. This two parameters row number must be the same, else the
 	function will stop with an error message. 
 
-	If you use the weigth or dist argument, than that variables won't be determined by random. 
+	If you use the weight or dist argument, than that variables won't be determined by random. 
         This could be useful if you want to retrain your network. In that case use both of this two arguments in the same time. 
 
 	The function works with normalized Gauss-functions, which width parameter will be the sigma argument. If you want to give the values, this argument 
@@ -66,7 +67,7 @@
 	neurons<-8;
 	\dontrun{
 	data<-rbftrain(x,neurons,y,sigma=NaN)
-	rbf(x,data$weigth,data$dist,data$neurons,data$sigma)
+	rbf(x,data$weight,data$dist,data$neurons,data$sigma)
 	}
 }
 
