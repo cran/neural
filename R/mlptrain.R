@@ -110,7 +110,7 @@ mlptrain<-function(inp,neurons,out,weight=c(),dist=c(),alfa=0.2,it=200,online=TR
 			deltak;
 		}
 
-	if (neurons==0) neurons<-c()
+	if ((length(neurons)==1)&&(neurons==0)) neurons<-c()
 
 	ls<-c(ncol(inp),neurons,ncol(out))
 
