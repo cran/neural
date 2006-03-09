@@ -1,4 +1,4 @@
-rbftrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=40,err=0,sigma=NaN,online=TRUE,permute=TRUE,visual=TRUE){
+rbftrain<-function(inp,neurons,out,weight=c(),dist=c(),alfa=0.2,it=40,err=0,sigma=NaN,online=TRUE,permute=TRUE,visual=TRUE, ...){
 
 		rect<-function(x,y,value){
 			xx<-c(x,x+30,x+30,x)
@@ -47,7 +47,7 @@ rbftrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=40,err=0,sigm
 						xx<-c(cordx[[i]][j]+30,cordx[[i+1]][k]);
 						yy<-c(cordy[[i]][j]+15,cordy[[i+1]][k]+15);
 						lines(xx,yy,col="blue");
-						text((xx[1]+xx[2])/2,(yy[1]+yy[2])/2,round(weigth[[i]][j,k]*100)/100,cex=0.8)
+						text((xx[1]+xx[2])/2,(yy[1]+yy[2])/2,round(weight[[i]][j,k]*100)/100,cex=0.8)
 					}
 				}
 			}
@@ -56,10 +56,6 @@ rbftrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=40,err=0,sigm
 
 		graph<-function(){
 			plot(1:700,1:700,xlab="",ylab="",type="n",axes=FALSE);
-#			minx<-min(inp)-abs(min(inp)*0.2)
-#			miny<-min(out)-abs(min(out)*0.2)
-#			dx<-(max(inp)*1.2)-minx
-#			dy<-(max(out)*1.2)-miny
 
 			dx<-(max(inp)-min(inp))*1.2
 			dy<-(max(out)-min(out))*1.2
@@ -95,38 +91,12 @@ rbftrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=40,err=0,sigm
 
 		identdif<-function(x) 1;
 	
-		v<-function(l,j) {vv<-0;for(i in 1:ls[l-1]) vv<-vv+val[[l-1]][i]*weigth[[l-1]][i,j];vv+dist[j]};
+		v<-function(l,j) {vv<-0;for(i in 1:ls[l-1]) vv<-vv+val[[l-1]][i]*weight[[l-1]][i,j];vv+dist[j]};
 
-
-#		valuate<-function(){
-#			value<-list();
-#			value[1]<-list(inp[watch,]);
-#			i<-2
-#			ee<-c();
-#			for(j in 1:ls[i]){
-#				e<-0;
-#				for(k in 1:ls[i-1]) 
-#					e<-e+abs((value[[i-1]][k]-weigth[[i-1]][k,j]));
-#				ee<-c(ee,gauss(e));
-#			}
-#			value[i]<-list(ee);
-#
-#			i<-3
-#			ee<-c();
-#			for(j in 1:ls[i]){
-#				e<-0;
-#				for(k in 1:ls[i-1]) 
-#					e<-e+value[[i-1]][k]*weigth[[i-1]][k,j];
-#				ee<-c(ee,ident(e+dist[j]));
-#			}
-#			value[i]<-list(ee);
-#			
-#			value;
-#		}
 
 		valuate1<-function(watch){
-			value<-list();
-			value[1]<-list(inp[watch,]);
+			value<-vector(1,mode="list");
+			value[[1]]<-inp[watch,];
 			total<-0;
 			ee<-c();
 
@@ -134,7 +104,7 @@ rbftrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=40,err=0,sigm
 			for(j in 1:ls[2]){
 				e<-0;
 				for(k in 1:ls[1]) 
-					e<-e+abs(value[[1]][k]-weigth[[1]][k,j]);
+					e<-e+abs(value[[1]][k]-weight[[1]][k,j]);
 				total<-total+gauss(e,sigmavalue[k,j]);
 			}
 
@@ -145,7 +115,7 @@ rbftrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=40,err=0,sigm
 				for(j in 1:ls[2]){
 					e<-0;
 					for(k in 1:ls[1])
-						e<-e+abs(value[[1]][k]-weigth[[1]][k,j]);
+						e<-e+abs(value[[1]][k]-weight[[1]][k,j]);
 					ee<-c(ee,gauss(e,sigmavalue[k,j])/total);
 				}
 			}
@@ -153,25 +123,25 @@ rbftrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=40,err=0,sigm
 		}
 
 		valuate2<-function(centre){
-			value<-list();
-			value[1]<-list(inp[watch,]);
-			value[2]<-list(centre[watch,]);
+			value<-vector(3,mode="list");
+			value[[1]]<-inp[watch,];
+			value[[2]]<-centre[watch,];
 			
 			ee<-c();
 			for(j in 1:ls[3]){
 				e<-0;
 				for(k in 1:ls[2]) 
-					e<-e+value[[2]][k]*weigth[[2]][k,j];
+					e<-e+value[[2]][k]*weight[[2]][k,j];
 				ee<-c(ee,ident(e+dist[j]));
 			}
-			value[3]<-list(ee);
+			value[[3]]<-ee;
 			
 			value;
 		}
 
 		valuate3<-function(pont){
-			value<-list();
-			value[1]<-list(pont);
+			value<-vector(2,mode="list");
+			value[[1]]<-pont;
 
 			total<-0;
 			ee<-c();
@@ -180,7 +150,7 @@ rbftrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=40,err=0,sigm
 			for(j in 1:ls[2]){
 				e<-0;
 				for(k in 1:ls[1]) 
-					e<-e+abs(value[[1]][k]-weigth[[1]][k,j]);
+					e<-e+abs(value[[1]][k]-weight[[1]][k,j]);
 				total<-total+gauss(e,sigmavalue[k,j]);
 			}
 
@@ -192,26 +162,26 @@ rbftrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=40,err=0,sigm
 				for(j in 1:ls[2]){
 					e<-0;
 					for(k in 1:ls[1]) 
-						e<-e+abs(value[[1]][k]-weigth[[1]][k,j]);
+						e<-e+abs(value[[1]][k]-weight[[1]][k,j]);
 					ee<-c(ee,gauss(e,sigmavalue[k,j])/total);
 				}
 			}
-			value[2]<-list(ee);
+			value[[2]]<-ee;
 
 			e<-0
 			for(k in 1:ls[2]) 
-				e<-e+value[[2]][k]*weigth[[2]][k,1];
+				e<-e+value[[2]][k]*weight[[2]][k,1];
 			ident(e+dist[1]);
 		}
 
 
 		deltaz<-function(){
-			deltak<-list();
+			deltak<-vector(3,mode="list");
 				dd<-c()
 				for(j in 1:ls[3]){
 					dd<-c(dd,(out[watch,j]-val[[3]][j]));#*identdif(v(i,j)));
 				}
-				deltak[3]<-list(dd);
+				deltak[[3]]<-dd;
 			deltak;
 		}
 
@@ -222,7 +192,6 @@ rbftrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=40,err=0,sigm
 			set<-rep(1,length(sampl))
 		
 			for(i in 1:k)
-#				kozep[i]<-sampl[ceiling(length(sampl)/k*i)]
 				kozep[i]<-(max(sampl)-min(sampl))/k*i+min(sampl)
 
 			valt<-1;szamol<-0;
@@ -261,7 +230,7 @@ rbftrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=40,err=0,sigm
 						d<-0
 						for(j in 1:ls[2])
 							if (i!=j)
-								d<-c(d,weigth[[1]][k,j]-weigth[[1]][k,i]);
+								d<-c(d,weight[[1]][k,j]-weight[[1]][k,i]);
 						maxim<-max(d);
 						minim<-min(d);
 						for(j in 1:length(d)){
@@ -284,22 +253,18 @@ rbftrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=40,err=0,sigm
 	retr<-FALSE;
 	retr2<-FALSE;
 
-	if (length(weigth)!=0){
-			if (length(weigth)!=2) return("The weigth arguments length must be 2.")
+	if (length(weight)!=0){
+			if (length(weight)!=2) return("The weight arguments length must be 2.")
 			for(i in 1:2){
-				if (nrow(weigth[[i]])!=ls[i]) return(paste("The number of rows is different in weigth[",i,"].",sep=""));
-				if (ncol(weigth[[i]])!=ls[i+1]) return(paste("The number of column is different in weigth[",i,"].",sep=""))
+				if (nrow(weight[[i]])!=ls[i]) return(paste("The number of rows is different in weight[",i,"].",sep=""));
+				if (ncol(weight[[i]])!=ls[i+1]) return(paste("The number of column is different in weight[",i,"].",sep=""))
 			}
 			retr<-TRUE
 		}
 	else{
-		weigth<-list()
-		for(i in 1:2) {weigth[i]<-list(matrix(c(0),ls[i],ls[i+1]))
-						if (i==2)
-						for(j in 1:ls[i])
-							for(k in 1:ls[i+1])
-								weigth[[i]][j,k]<-runif(1,min=-1,max=1)
-			    }
+		weight<-vector(2,mode="list")
+		weight[[1]]<-matrix(c(0),ls[1],ls[2])
+		weight[[2]]<-matrix(runif(ls[2]*ls[3],min=-1),ls[2],ls[3])
 	}
 
 	if (length(dist)!=0){
@@ -313,14 +278,14 @@ rbftrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=40,err=0,sigm
         sigmavalue<-matrix(0,ls[1],ls[2])
 
 	if (visual){
-		cordx<-list();cordy<-list();
+		cordx<-vector(3,mode="list");cordy<-vector(3,mode="list");
 		for(i in 1:length(ls)){
 			xc<-c();yc<-c();
 			for(j in 1:ls[i]){
 				xc<-c(xc,350-length(ls)*80+i*160);
 				yc<-c(yc,350+ls[i]*30-j*60);
 			}
-			cordx[i]<-list(xc);cordy[i]<-list(yc);
+			cordx[[i]]<-xc;cordy[[i]]<-yc;
 		}
 	}
 
@@ -358,11 +323,11 @@ rbftrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=40,err=0,sigm
 
 					if (nrow(inp)<=neurons){
 						for(i in 1:ncol(inp))
-							weigth[[1]][i,]<-clust(inp[,i],neurons);
+							weight[[1]][i,]<-clust(inp[,i],neurons);
 					}
 					else
 						for(i in 1:ncol(inp))
-							weigth[[1]][i,]<-kmeans(inp[,i],neurons)$centers[,1];
+							weight[[1]][i,]<-kmeans(inp[,i],neurons)$centers[,1];
 
 					}				
 				
@@ -388,7 +353,7 @@ rbftrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=40,err=0,sigm
 					}
 			
 					if (permute) perm<-sample(nrow(inp),nrow(inp)) else perm<-1:nrow(inp);
-					w2<-weigth;
+					w2<-weight;
 					t2<-dist;
 					error<-0
 					for(ii in 1:nrow(inp)){
@@ -406,10 +371,10 @@ rbftrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=40,err=0,sigm
 								if (online) dist[j]<-dist[j]+alfa*delta[[k+1]][j]
 								else t2[[k+1]][j]<-t2[[k+1]][j]+alfa*delta[[k+1]][j];
 						}
-						if (online) weigth<-w2;
+						if (online) weight<-w2;
 					}
 					error<-error/(nrow(inp)*ncol(out));
-					if (!online){ weigth<-w2;dist<-t2;}
+					if (!online){ weight<-w2;dist<-t2;}
 				}
 
 		
@@ -444,6 +409,6 @@ rbftrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=40,err=0,sigm
 		}
 	}
 
-	reslt<-list(weigth=weigth,dist=dist,neurons=ls,sigma=sigmavalue);
+	reslt<-list(weight=weight,dist=dist,neurons=ls,sigma=sigmavalue);
 	reslt;
 }

@@ -1,4 +1,4 @@
-mlp<-function(inp,weigth,dist,neurons,actfns=c(),layer=NaN){
+mlp<-function(inp,weight,dist,neurons,actfns=c(),layer=NaN, ...){
 
 		sigmoid<-function(x) 1/(1+exp(-x));
 
@@ -15,7 +15,7 @@ mlp<-function(inp,weigth,dist,neurons,actfns=c(),layer=NaN){
 				ee<-c();
 				for(j in 1:neurons[i]){
 					e<-0;
-					for(k in 1:neurons[i-1]) e<-e+value[[i-1]][k]*weigth[[i-1]][k,j];
+					for(k in 1:neurons[i-1]) e<-e+value[[i-1]][k]*weight[[i-1]][k,j];
 					ee<-c(ee,fnc[[i-1]](e+dist[[i]][j]));
 				}
 				value[i]<-list(ee);

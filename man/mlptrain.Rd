@@ -5,8 +5,8 @@
 
 \description{A simple MLP neural network that is suitable for classification tasks.}
 
-\usage{	mlptrain(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=200,online=TRUE,
-		permute=TRUE,thresh=0,dthresh=0.1,actfns=c(),diffact=c(),visual=TRUE)
+\usage{	mlptrain(inp,neurons,out,weight=c(),dist=c(),alfa=0.2,it=200,online=TRUE,
+		permute=TRUE,thresh=0,dthresh=0.1,actfns=c(),diffact=c(),visual=TRUE, ...)
 }
 
 \arguments{
@@ -15,7 +15,7 @@
 	\item{neurons}{a numeric vector with length equals to the number of layers in the network, and
 			the ith layer will contains neurons[i] neuron.}
 	\item{out}{a matrix that contains one output data in each row.}
-	\item{weigth}{the starting weigths of the network.}
+	\item{weight}{the starting weights of the network.}
 	\item{dist}{the starting distortions of the network.}
 	\item{alfa}{the learning-rate parameter of the back-propagation algorithm.}
 	\item{it}{the maximum number of training iterations.}
@@ -39,12 +39,13 @@
 	\item{diffact}{a list, which contains the differential of the activation functions. Only need to use if you use your own activation functions.}	
 	\item{visual}{a logical value, that switches on/off the
 	  graphical user interface.}
+	\item{\dots}{currently not used.}
 }
 
 \value{
 	a list with 5 arguments:
 
-	\item{weigth}{the weigths of the network.}
+	\item{weight}{the weights of the network.}
 	\item{dist}{the distortions of the network.}
         \item{neurons}{a numeric vector with length equals to the number of layers in the network, and
 			the ith layer will contains neurons[i] neuron.}
@@ -61,7 +62,7 @@
 	out parameters. The inp and out parameters has to be the same
 	number of rows, otherwise the function will stop with an error message. 
 
-	If you use the weigth or dist argument, than that variables won't be determined by random. 
+	If you use the weight or dist argument, than that variables won't be determined by random. 
         This could be useful if you want to retrain your network. In that case use both of this two arguments. 
         
 	From this vesion of the package there is the chance to use your own activation functions, by using the actfns
@@ -87,7 +88,7 @@
 	neurons<-4
 	\dontrun{
 	data<-mlptrain(x,neurons,y,it=4000);
-	mlp(x,data$weigth,data$dist,data$neurons,data$actfns)
+	mlp(x,data$weight,data$dist,data$neurons,data$actfns)
 	}
 }
 
