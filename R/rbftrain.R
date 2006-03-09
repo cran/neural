@@ -1,4 +1,4 @@
-rbftrain<-function(inp,neurons,out,alfa=0.2,it=40,err=0,sigma=1,online=TRUE,permute=TRUE,visual=TRUE){
+rbftrain<-function(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=40,err=0,sigma=1,online=TRUE,permute=TRUE,visual=TRUE){
 
 		rect<-function(x,y,value){
 			xx<-c(x,x+30,x+30,x)
@@ -269,22 +269,41 @@ rbftrain<-function(inp,neurons,out,alfa=0.2,it=40,err=0,sigma=1,online=TRUE,perm
 	err<-abs(err)
 	ls<-c(ncol(inp),neurons,ncol(out))
 	if (nrow(inp)!=nrow(out)) return("Different input and output sample length");
-	
+	retr<-FALSE;
+	retr2<-FALSE;
 
-	weigth<-list()
-	for(i in 1:(length(ls)-1)) {weigth[i]<-list(matrix(c(0),ls[i],ls[i+1]))
-					if (i!=1)
-					for(j in 1:ls[i])
-						for(k in 1:ls[i+1])
-							weigth[[i]][j,k]<-runif(1,min=-1,max=1)
-				    }
+	if (length(weigth)!=0){
+			if (length(weigth)!=2) return("The weigth arguments length must be 2.")
+			for(i in 1:2){
+				if (nrow(weigth[[i]])!=ls[i]) return(paste("The number of rows is different in weigth[",i,"].",sep=""));
+				if (ncol(weigth[[i]])!=ls[i+1]) return(paste("The number of column is different in weigth[",i,"].",sep=""))
+			}
+			retr<-TRUE
+		}
+	else{
+		weigth<-list()
+		for(i in 1:2) {weigth[i]<-list(matrix(c(0),ls[i],ls[i+1]))
+						if (i==2)
+						for(j in 1:ls[i])
+							for(k in 1:ls[i+1])
+								weigth[[i]][j,k]<-runif(1,min=-1,max=1)
+			    }
+	}
 
-	dist<-list();
-	dist[1]<-list()
-	dist[2]<-list(rep(0,ls[2]))
-	dist[3]<-list(rep(1,ls[3]))
-	for(j in 1:ls[3]) dist[[3]][j]<-runif(1,min=-1,max=1);
-
+	if (length(dist)!=0){
+		if (length(dist)!=length(ls)) return("The dist arguments length must be equal with the number of layers.")
+		for(i in 2:3){
+			if (length(dist[[i]])!=ls[i]) return(paste("The length of the distortion is different in dist[",i,"]",sep=""))
+		}
+		retr2<-TRUE
+	}
+	else{
+		dist<-list();
+		dist[1]<-list()
+		dist[2]<-list(rep(0,ls[2]))
+		dist[3]<-list(rep(1,ls[3]))
+		for(j in 1:ls[3]) dist[[3]][j]<-runif(1,min=-1,max=1);	
+	}
 
 	if (visual){
 		cordx<-list();cordy<-list();
@@ -324,21 +343,22 @@ rbftrain<-function(inp,neurons,out,alfa=0.2,it=40,err=0,sigma=1,online=TRUE,perm
 
 		if ((!visual)|(coor$x>540)&(coor$x<620)&(coor$y>550)&(coor$y<620)){
 			if (!run) {
-				if (visual){
-					polygon(c(100,500,500,100),c(350,350,250,250),col="ivory2");
-					text(300,300,"Clustering",cex=2);
-				}
+				if (!retr){
+					if (visual){
+						polygon(c(100,500,500,100),c(350,350,250,250),col="ivory2");
+						text(300,300,"Clustering",cex=2);
+					}
 
-				if (nrow(inp)>=neurons){
-					for(i in 1:ncol(inp))
-						weigth[[1]][i,]<-clust(inp[,i],neurons);
-				}
-				else
-					for(i in 1:ncol(inp))
-						weigth[[1]][i,]<-kmeans(inp[,i],neurons)$centers[,1];
+					if (nrow(inp)>=neurons){
+						for(i in 1:ncol(inp))
+							weigth[[1]][i,]<-clust(inp[,i],neurons);
+					}
+					else
+						for(i in 1:ncol(inp))
+							weigth[[1]][i,]<-kmeans(inp[,i],neurons)$centers[,1];
 
-				
-				if ((is.nan(sigma))&(ls[1]==1)) dist[2]<-list(sigmaz());
+					}				
+				if ((!retr2)&(is.nan(sigma))&(ls[1]==1)) dist[2]<-list(sigmaz());
 
 				for(i in 1:nrow(inp)) centre[i,]<-valuate1(i);
 				val<-valuate2(centre);

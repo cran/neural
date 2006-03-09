@@ -5,14 +5,16 @@
 
 \description{A simple RBF neural network which suitable for approximation.}
 
-\usage{	rbftrain(inp,neurons,out,alfa=0.2,it=40,err=0,sigma=1,online=TRUE,
-		permute=TRUE,visual=TRUE)
+\usage{	rbftrain(inp,neurons,out,weigth=c(),dist=c(),alfa=0.2,it=40,err=0,
+        sigma=1,online=TRUE,permute=TRUE,visual=TRUE)
 }
 
 \arguments{
 	\item{inp}{a matrix that contains one input data in each row.}
 	\item{neurons}{the number of neurons in the hidden layer.}
 	\item{out}{a matrix that contains one output data in each row.}
+	\item{weigth}{the starting weigths of the network.}
+	\item{dist}{the starting distortions of the network.}
 	\item{alfa}{the learning-rate parameter of the back-propagation algorithm.}
 	\item{it}{the maximum number of training iterations.}
 	\item{err}{the average error at the studying points,if the average error
@@ -39,6 +41,10 @@
 	function parameters. After the creation of the network the function trains
 	it using the back-propagation algorithm using the inp and out parameter. This two parameters row number must be the same, else the
 	function will stop with an error message. 
+
+	If you use the weigth or dist argument, than that variables won`t be determined by random. 
+        This could be useful if you want to retrain your network. In that case use both of this two arguments in the same time. 
+
 	The function works with normalized Gauss-functions, whose width parameter will be the sigma argument. If the sigma argument is 0, then
 	the width of each Gauss function will be the half of the distance between the two nearest training samples.
 	The function has a graphical user interface that can be switched
