@@ -6,7 +6,7 @@
 
 \description{This data set gives the expected response for the \code{letters_train} dataset. Each letter has more than one representation. }
 
-\usage{data(letters)}
+\usage{data(letters_out)}
 \format{A matrix containing 40 response. Each row represents one expected response.}
 \source{Collecting from about 10 person and from some frequently used font type}
 

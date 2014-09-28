@@ -73,9 +73,9 @@ rbftrain<-function(inp,neurons,out,weight=c(),dist=c(),alfa=0.2,it=40,err=0,sigm
 
 			for(i in 0:7){
 				lines(c(30,50),c(100*i+20,100*i+20));
-				text(x=0,y=i*100+20,round(i/7*dy+miny,digit=3),cex=0.7);
+				text(x=0,y=i*100+20,round(i/7*dy+miny,digits=3),cex=0.7);
 				lines(c(100*i+40,100*i+40),c(10,30));
-				text(x=i*100+40,y=0,round(i/7*dx+minx,digit=3),cex=0.7);
+				text(x=i*100+40,y=0,round(i/7*dx+minx,digits=3),cex=0.7);
 			}
 
 

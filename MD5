@@ -1,0 +1,16 @@
+8ad81c88f09461446bbb2f681a4c3e8c *DESCRIPTION
+3b99f42907b369ca287e5bdea049525b *NAMESPACE
+01908550dce3df439dc997262e0d5f1a *R/mlp.r
+7bfa1f5d2b07712137479687c575083f *R/mlptrain.r
+720dc87295e5e96e90ea22cbc8ba3e99 *R/rbf.r
+1657c0c378711db0f408ed4c6bc3af50 *R/rbftrain.r
+05335aec69e332214df8f5a1c2a1c52d *data/letters_out.rda
+16f4a03d60eba179101c741f1dfb25a6 *data/letters_recall.rda
+bf60808c36ccad8978e7b41b4c0a4e63 *data/letters_train.rda
+6ebf9862c2c4b2a30bc29a8fe2ee1819 *man/letter_out.rd
+39bf51e1bae54127590c6a76856ff6fb *man/letter_recall.rd
+8274f9fcf512bc049bfb3ecc958eaf7d *man/letters_train.rd
+cd5aae03bdf203fc41cf5a0c40bf2a3f *man/mlp.rd
+33025c142fe2aa221061fafbd91626be *man/mlptrain.rd
+9aaecb99de8a5b6a62591ebd25e107eb *man/rbf.rd
+694ad4055075a6739c98ecfee64dc936 *man/rbftrain.rd

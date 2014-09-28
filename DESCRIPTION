@@ -1,8 +1,11 @@
 Package: neural
-Version: 1.4.2.1
+Version: 1.4.2.2
 Title: Neural Networks
-Author: Ádám Nagy
-Maintainer: ORPHANED
+Author: Adam Nagy
+Maintainer: Billy Aung Myint <r@use-r.com>
 Description: RBF and MLP neural networks with graphical user interface
-License: GPL version 2 or later
-Packaged: 2009-09-24 16:21:18 UTC; hornik
+License: GPL (>= 2)
+Repository: CRAN
+Packaged: 2014-09-28 13:32:07 UTC; billy
+NeedsCompilation: no
+Date/Publication: 2014-09-28 18:26:46
